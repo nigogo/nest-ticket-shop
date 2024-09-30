@@ -34,6 +34,7 @@ jobs:
       - name: Run unit tests
         env:
           DB_URL: ${{ vars.DB_URL }}
+          JWT_SECRET: ${{ vars.JWT_SECRET }}
         run: npm run test:unit:ci
 
   e2e-tests:
@@ -49,9 +50,9 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-          --env POSTGRES_USER=${{ vars.DB_USER }}
-          --env POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
-          --env POSTGRES_DB=${{ vars.DB_NAME }}
+          --e POSTGRES_USER=${{ vars.DB_USER }}
+          --e POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
+          --e POSTGRES_DB=${{ vars.DB_NAME }}
 
     steps:
       - name: Checkout code
