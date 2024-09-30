@@ -1,4 +1,4 @@
-name: CI for NestJS Project
+name: Ticket Shop CI
 
 on:
   push:
