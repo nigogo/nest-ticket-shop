@@ -49,10 +49,9 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-        env:
-          - POSTGRES_USER=${{ vars.DB_USER }}
-          - POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
-          - POSTGRES_DB=${{ vars.DB_NAME }}
+          --env POSTGRES_USER=${{ vars.DB_USER }}
+          --env POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
+          --env POSTGRES_DB=${{ vars.DB_NAME }}
 
     steps:
       - name: Checkout code
