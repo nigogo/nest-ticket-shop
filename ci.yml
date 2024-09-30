@@ -1,0 +1,89 @@
+name: CI for NestJS Project
+
+on:
+  push:
+    branches:
+      - '**' # Run on all branches for every push
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run unit tests
+        env:
+          DB_URL: ${{ DB_URL }}
+        run: npm run test:unit:ci
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      test-db:
+        image: postgres:16
+        ports:
+          - ${TEST_DB_PORT}:${TEST_DB_PORT}
+        options: >-
+          --health-cmd="pg_isready -U $DB_USER"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+        env:
+          - POSTGRES_USER=${DB_USER}
+          - POSTGRES_PASSWORD=${DB_PASSWORD}
+          - POSTGRES_DB=${DB_NAME}
+        command: -p ${TEST_DB_PORT}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Spin up Docker Compose for e2e tests
+#      - name: Start Docker Compose services
+#        run: |
+#          sudo docker compose up -d test-db  # Adjusts to your `docker-compose.yml`
+#        env:
+#          TEST_DB_PORT: ${{ TEST_DB_PORT }}
+#          DB_USER: ${{ DB_USER }}
+#          DB_PASSWORD: ${{ DB_PASSWORD }}
+#          DB_NAME: ${{ DB_NAME }}
+
+      # Wait for DB to be ready
+      - name: Wait for test-db to be ready
+        run: sleep 10
+
+      # Run e2e tests
+      - name: Run e2e tests
+        env:
+          TEST_DB_PORT: ${{ TEST_DB_PORT }}
+          DB_URL: ${{ DB_URL }}
+        run: npm run test:e2e:ci

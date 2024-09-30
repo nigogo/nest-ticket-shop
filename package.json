@@ -19,9 +19,8 @@
     "test:unit": "export $(grep -v '^#' .env.test | xargs) && jest --config ./test/jest-unit-spec.json --watch",
     "test:e2e": "sudo -v && export $(grep -v '^#' .env.test | xargs) && sudo -preserve-env=TEST_DB_PORT,DB_URL docker compose up test-db -d && jest --config ./test/jest-e2e.json --watch",
     "test:e2e:user": "export $(grep -v '^#' .env.test | xargs) && docker compose up test-db -d && jest --config ./test/jest-e2e.json --watch",
-    "prisma:studio": "export $(grep -v '^#' .env.local | xargs) && npx prisma studio",
-    "prisma:generate": "export $(grep -v '^#' .env.local | xargs) && npx prisma generate",
-    "prisma:migrate": "export $(grep -v '^#' .env.local | xargs) && npx prisma migrate deploy"
+    "test:unit:ci": "jest --config ./test/jest-unit-spec.json",
+    "test:e2e:ci": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
