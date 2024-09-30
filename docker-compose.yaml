@@ -1,0 +1,54 @@
+services:
+  api:
+    container_name: ticket-shop-api
+    build: .
+    ports:
+      - 3000:${API_PORT}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=${API_NODE_ENV}
+      - PORT=${API_PORT}
+      - DB_URL=${DB_URL}
+    depends_on:
+      - db
+    networks:
+      - ticket-shop-network
+
+  db:
+    container_name: ticket-shop-db
+    image: postgres:16
+    restart: always
+    shm_size: 128mb
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    networks:
+      - ticket-shop-network
+    volumes:
+      - ticket-shop-db-data:/var/lib/postgresql/data
+
+  test-db:
+    image: postgres:16
+    restart: always
+    shm_size: 128mb
+    container_name: ticket-shop-test-db
+    ports:
+      - ${TEST_DB_PORT}:${TEST_DB_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    command:
+      - -p ${TEST_DB_PORT}
+
+networks:
+  ticket-shop-network:
+    driver: bridge
+
+volumes:
+  ticket-shop-db-data:
