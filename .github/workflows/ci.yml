@@ -8,6 +8,7 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    environment: CI
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,6 +40,7 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
+    environment: CI
 
     services:
       test-db:
@@ -50,9 +52,9 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
-          --e POSTGRES_USER=${{ vars.DB_USER }}
-          --e POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
-          --e POSTGRES_DB=${{ vars.DB_NAME }}
+          -e POSTGRES_USER=${{ vars.DB_USER }}
+          -e POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
+          -e POSTGRES_DB=${{ vars.DB_NAME }}
 
     steps:
       - name: Checkout code
