@@ -43,17 +43,17 @@ jobs:
       test-db:
         image: postgres:16
         ports:
-          - ${TEST_DB_PORT}:${TEST_DB_PORT}
+          - ${{ TEST_DB_PORT }}:${{ TEST_DB_PORT }}
         options: >-
           --health-cmd="pg_isready -U $DB_USER"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
         env:
-          - POSTGRES_USER=${DB_USER}
-          - POSTGRES_PASSWORD=${DB_PASSWORD}
-          - POSTGRES_DB=${DB_NAME}
-        command: -p ${TEST_DB_PORT}
+          - POSTGRES_USER=${{ DB_USER }}
+          - POSTGRES_PASSWORD=${{ DB_PASSWORD }}
+          - POSTGRES_DB=${{ DB_NAME }}
+        command: -p ${{ TEST_DB_PORT }}
 
     steps:
       - name: Checkout code
