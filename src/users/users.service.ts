@@ -1,66 +1,65 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { UserInterface } from '../common/interfaces/user.interface';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { UserDto } from '../auth/dto/user.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
 	logger = new Logger(UsersService.name);
 
-	constructor() {}
+	constructor(
+		@InjectRepository(User)
+		private usersRepository: Repository<User>
+	) {}
 
 	async getUserForInternalUse(username: string): Promise<UserInterface | null> {
-		return {
-			id: 1,
-			username,
-			password: 'password',
-		};
+		try {
+			const user = await this.usersRepository.findOneBy({ username });
+			if (user) {
+				return {
+					id: user.id,
+					username: user.username,
+					password: user.password,
+				};
+			}
+			return null;
+		} catch (e) {
+			// TODO global error handling
+			// TODO concise error handling
+			this.logger.error(e);
+			throw e;
+		}
 	}
 
-	async getUser(id: number): Promise<UserInterface> {
-		return {
-			id,
-			username: 'username',
-			password: 'password',
-		};
+	async createUser({username, password}: { username: string, password: string }): Promise<User> {
+		try {
+			const user = this.usersRepository.create({
+				username,
+				password,
+			});
+			return await this.usersRepository.save(user);
+		} catch (e) {
+			// TODO global error handling
+			// TODO concise error handling
+			this.logger.error(e);
+			throw e;
+		}
 	}
 
-	// TODO ORM
-	// async getUserForInternalUse(username: string): Promise<User | null> {
-	// 	try {
-	// 		const user = await this.prisma.user.findUnique({ where: { username } });
-	// 		if (user) {
-	// 			return {
-	// 				id: user.id,
-	// 				username: user.username,
-	// 				password: user.password,
-	// 			};
-	// 		}
-	// 		return null;
-	// 	} catch (e) {
-	// 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
-	// 			if (e.code === 'P2025') {
-	// 				throw new NotFoundException(
-	// 					`User with username ${username} not found`
-	// 				);
-	// 			}
-	// 		}
-	// 		this.logger.error(e);
-	// 		throw e;
-	// 	}
-	// }
-
-	// TODO ORM
-	// async getUser(id: number): Promise<UserDto> {
-	// 	try {
-	// 		const user = await this.prisma.user.findUnique({ where: { id } });
-	// 		return plainToInstance(UserDto, user);
-	// 	} catch (e) {
-	// 		if (e instanceof Prisma.PrismaClientKnownRequestError) {
-	// 			if (e.code === 'P2025') {
-	// 				throw new NotFoundException(`User not found`);
-	// 			}
-	// 		}
-	// 		this.logger.error(e);
-	// 		throw e;
-	// 	}
-	// }
+	async getUser(id: number): Promise<UserDto> {
+		try {
+			const user = await this.usersRepository.findOneOrFail({
+				where: { id },
+			});
+			return plainToInstance(UserDto, user);
+		} catch (e) {
+			// TODO global error handling
+			// TODO concise error handling
+			this.logger.error(e);
+			throw e;
+		}
+	}
 }

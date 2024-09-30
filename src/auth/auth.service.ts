@@ -22,29 +22,16 @@ export class AuthService {
 
 	async register({ username, password }: RegisterUserDto): Promise<UserDto> {
 		try {
-			// TODO ORM
-			// const user = await this.prisma.user.create({
-			// 	data: {
-			// 		username,
-			// 		password: await this.hashPassword(password),
-			// 	},
-			// });
-			const user = {
-				id: 1,
+			const user = await this.usersService.createUser({
 				username,
 				password: await this.hashPassword(password),
-			}
+			});
 
 			// Note: plainToInstance is used as a safeguard to ensure that no sensitive data is returned
 			return plainToInstance(UserDto, user);
 		} catch (e) {
-			// TODO ORM
-			// if (e.code === 'P2002') {
-			// 	const message = `User with username '${username}' already exists`;
-			// 	this.logger.error(message);
-			// 	throw new ConflictException(message);
-			// }
-			//
+			// TODO global error handling
+			// TODO concise error handling
 			this.logger.error(e);
 			throw e;
 		}
@@ -79,6 +66,7 @@ export class AuthService {
 	}
 
 	// public modifiers for testing purposes, generally this is not recommended
+	// TODO minor: possible w/o public modifier?
 	public async hashPassword(password: string) {
 		return bcrypt.hash(password, 10);
 	}

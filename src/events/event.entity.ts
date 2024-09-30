@@ -2,7 +2,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
-	ManyToOne, OneToMany,
+	OneToMany,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
 } from 'typeorm';
@@ -24,7 +24,7 @@ export class Event implements EventInterface {
 	name!: string;
 
 	@Column({ type: 'date' })
-	date!: Date
+	date!: Date;
 
 	@Column()
 	location!: string;

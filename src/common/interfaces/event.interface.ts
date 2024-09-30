@@ -1,5 +1,3 @@
-import { TicketInterface } from './ticket.interface';
-
 export interface EventInterface {
 	id: number;
 	name: string;
