@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { EventsModule } from './events/events.module';
 import * as process from 'node:process';
 
 @Module({
@@ -13,7 +14,7 @@ import * as process from 'node:process';
 		entities: [__dirname + '/**/*.entity{.ts,.js}'],
 		synchronize: true,
 		autoLoadEntities: true,
-	})],
+	}), EventsModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
