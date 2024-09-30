@@ -39,7 +39,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			.post('/auth/register')
 			.send(registerUserDto)
 			.expect((res) => {
-				console.log(res.body);
 				expect(res.status).toBe(201);
 				expect(res.body).toBeDefined();
 				expect(res.body).not.toHaveProperty('id');

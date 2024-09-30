@@ -21,20 +21,13 @@ export class AuthService {
 	) {}
 
 	async register({ username, password }: RegisterUserDto): Promise<UserDto> {
-		try {
-			const user = await this.usersService.createUser({
-				username,
-				password: await this.hashPassword(password),
-			});
+		const user = await this.usersService.createUser({
+			username,
+			password: await this.hashPassword(password),
+		});
 
-			// Note: plainToInstance is used as a safeguard to ensure that no sensitive data is returned
-			return plainToInstance(UserDto, user);
-		} catch (e) {
-			// TODO global error handling
-			// TODO concise error handling
-			this.logger.error(e);
-			throw e;
-		}
+		// Note: plainToInstance is used as a safeguard to ensure that no sensitive data is returned
+		return plainToInstance(UserDto, user);
 	}
 
 	async login(user: UserInterface): Promise<AccessTokenDto> {

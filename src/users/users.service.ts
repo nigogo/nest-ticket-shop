@@ -42,9 +42,7 @@ export class UsersService {
 			});
 			return await this.usersRepository.save(user);
 		} catch (e) {
-			// TODO global error handling
-			// TODO concise error handling
-			this.logger.error(e);
+			console.error(JSON.stringify(e, null, 2));
 			throw e;
 		}
 	}
