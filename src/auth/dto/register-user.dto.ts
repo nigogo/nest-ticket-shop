@@ -1,6 +1,6 @@
-import { IsValidUsername } from '../../decorators/is-valid-username.decorator';
+import { IsValidUsername } from '../../common/decorators/is-valid-username.decorator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsValidPassword } from '../../decorators/is-valid-password.decorator';
+import { IsValidPassword } from '../../common/decorators/is-valid-password.decorator';
 import {
 	passwordMessage,
 	passwordOptions,

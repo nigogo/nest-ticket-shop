@@ -8,14 +8,14 @@ test data is often seeded to a database.
 
 import { RegisterUserDto } from '../src/auth/dto/register-user.dto';
 import { UserDto } from '../src/auth/dto/user.dto';
-import { User } from '../src/interfaces/user.interface';
+import { UserInterface } from '../src/common/interfaces/user.interface';
 
 export const registerUserDto: RegisterUserDto = {
 	username: 'john_doe',
 	password: 'P4$$w0rd',
 };
 
-export const user: User = {
+export const user: UserInterface = {
 	id: 1,
 	username: registerUserDto.username,
 	password: 'password-hash',

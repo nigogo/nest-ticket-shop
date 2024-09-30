@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { User } from '../interfaces/user.interface';
+import { UserInterface } from '../common/interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
@@ -7,7 +7,7 @@ export class UsersService {
 
 	constructor() {}
 
-	async getUserForInternalUse(username: string): Promise<User | null> {
+	async getUserForInternalUse(username: string): Promise<UserInterface | null> {
 		return {
 			id: 1,
 			username,
@@ -15,7 +15,7 @@ export class UsersService {
 		};
 	}
 
-	async getUser(id: number): Promise<User> {
+	async getUser(id: number): Promise<UserInterface> {
 		return {
 			id,
 			username: 'username',

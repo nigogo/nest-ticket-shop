@@ -5,10 +5,10 @@ import * as bcrypt from 'bcrypt';
 import { plainToInstance } from 'class-transformer';
 import { UsersService } from '../users/users.service';
 import { LoginUserDto } from './dto/login-user.dto';
-import { User } from '../interfaces/user.interface';
+import { UserInterface } from '../common/interfaces/user.interface';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -50,7 +50,7 @@ export class AuthService {
 		}
 	}
 
-	async login(user: User): Promise<AccessTokenDto> {
+	async login(user: UserInterface): Promise<AccessTokenDto> {
 		const payload: JwtPayload = {
 			sub: user.id,
 			username: user.username,
@@ -65,7 +65,7 @@ export class AuthService {
 	async validateUser({
 		username,
 		password,
-	}: LoginUserDto): Promise<User | null> {
+	}: LoginUserDto): Promise<UserInterface | null> {
 		const user = await this.usersService.getUserForInternalUse(username);
 		const isCorrectPassword =
 			user?.password && (await this.comparePasswords(password, user?.password));
