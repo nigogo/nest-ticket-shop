@@ -1,5 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+	Column,
+	CreateDateColumn,
+	Entity,
+	JoinColumn,
+	OneToMany,
+	PrimaryGeneratedColumn,
+	UpdateDateColumn,
+} from 'typeorm';
 import { UserInterface } from '../common/interfaces/user.interface';
+import { Ticket } from '../tickets/ticket.entity';
 
 export enum UserType {
 	USER = 'user',
@@ -11,7 +20,13 @@ export class User implements UserInterface {
 	@PrimaryGeneratedColumn()
 	id!: number;
 
-	// unique col username
+	@CreateDateColumn({ type: 'timestamptz' })
+	created_at!: Date;
+
+	@UpdateDateColumn({ type: 'timestamptz' })
+	updated_at!: Date;
+
+	// TODO consider indexing username
 	@Column({ unique: true })
 	username!: string;
 
@@ -24,4 +39,7 @@ export class User implements UserInterface {
 		default: UserType.USER,
 	})
 	role!: UserType;
+
+	@OneToMany(() => Ticket, (ticket) => ticket.user)
+	tickets!: Ticket[];
 }
