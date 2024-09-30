@@ -1,0 +1,90 @@
+name: Ticket Shop CI
+
+on:
+  push:
+    branches:
+      - '**' # Run on all branches for every push
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    environment: CI
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run unit tests
+        env:
+          DB_URL: ${{ vars.DB_URL }}
+          JWT_SECRET: ${{ vars.JWT_SECRET }}
+        run: npm run test:unit:ci
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    environment: CI
+
+    services:
+      test-db:
+        image: postgres:16
+        ports:
+          - ${{ vars.TEST_DB_PORT }}:${{ vars.TEST_DB_PORT }}
+        options: >-
+          --health-cmd="pg_isready -U ${{ vars.DB_USER }}"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          -e POSTGRES_USER=${{ vars.DB_USER }}
+          -e POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
+          -e POSTGRES_DB=${{ vars.DB_NAME }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Spin up Docker Compose for e2e tests
+#      - name: Start Docker Compose services
+#        run: |
+#          sudo docker compose up -d test-db  # Adjusts to your `docker-compose.yml`
+#        env:
+#          TEST_DB_PORT: ${{ TEST_DB_PORT }}
+#          DB_USER: ${{ DB_USER }}
+#          DB_PASSWORD: ${{ DB_PASSWORD }}
+#          DB_NAME: ${{ DB_NAME }}
+
+      # Wait for DB to be ready
+      - name: Wait for test-db to be ready
+        run: sleep 10
+
+      # Run e2e tests
+      - name: Run e2e tests
+        env:
+          TEST_DB_PORT: ${{ vars.TEST_DB_PORT }}
+          DB_URL: ${{ vars.DB_URL }}
+        run: npm run test:e2e:ci
