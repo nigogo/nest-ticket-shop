@@ -53,7 +53,6 @@ jobs:
           - POSTGRES_USER=${{ vars.DB_USER }}
           - POSTGRES_PASSWORD=${{ vars.DB_PASSWORD }}
           - POSTGRES_DB=${{ vars.DB_NAME }}
-        command: -p ${{ vars.TEST_DB_PORT }}
 
     steps:
       - name: Checkout code
