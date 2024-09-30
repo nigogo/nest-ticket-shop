@@ -3,39 +3,49 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { registerUserDto } from './test-data';
+import { Repository } from 'typeorm';
+import { User } from '../src/users/user.entity';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 
 describe('Application Behavior Tests (e2e)', () => {
 	let app: INestApplication;
+	let userRepository: Repository<User>;
 
 	beforeEach(async () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
-			imports: [AppModule],
-			providers: [],
+			imports: [AppModule, TypeOrmModule.forRoot({
+				type: 'postgres',
+				url: process.env.DB_URL,
+				entities: [__dirname + '/**/*.entity{.ts,.js}'],
+				synchronize: true,
+			})],
 		}).compile();
 
 		app = moduleFixture.createNestApplication();
 		app.useGlobalPipes(new ValidationPipe());
 		await app.init();
-		// TODO ORM
-		// prisma = moduleFixture.get<PrismaService>(PrismaService);
+		userRepository = moduleFixture.get<Repository<User>>(
+			getRepositoryToken(User)
+		);
 	});
 
-	// TODO ORM
-	// afterEach(async () => {
-	// 	await prisma.user.deleteMany();
-	// });
+	afterEach(async () => {
+		await userRepository.delete({});
+		await app.close();
+	});
 
 	it('/auth/register (POST) - should create a new user', async () => {
 		await request(app.getHttpServer())
 			.post('/auth/register')
 			.send(registerUserDto)
 			.expect((res) => {
+				console.log(res.body);
 				expect(res.status).toBe(201);
 				expect(res.body).toBeDefined();
 				expect(res.body).not.toHaveProperty('id');
 				expect(res.body).toHaveProperty('username', registerUserDto.username);
-				expect(res.body).not.toHaveProperty('createdAt');
-				expect(res.body).not.toHaveProperty('updatedAt');
+				expect(res.body).not.toHaveProperty('created_at');
+				expect(res.body).not.toHaveProperty('updated_at');
 			});
 	});
 

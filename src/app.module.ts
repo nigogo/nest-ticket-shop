@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventsModule } from './events/events.module';
+import { TicketsModule } from './tickets/tickets.module';
 import * as process from 'node:process';
 
 @Module({
@@ -14,7 +15,7 @@ import * as process from 'node:process';
 		entities: [__dirname + '/**/*.entity{.ts,.js}'],
 		synchronize: true,
 		autoLoadEntities: true,
-	}), EventsModule],
+	}), EventsModule, TicketsModule],
 	controllers: [AppController],
 	providers: [AppService],
 })

@@ -11,7 +11,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { User } from '../interfaces/user.interface';
+import { UserInterface } from '../common/interfaces/user.interface';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { Request } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -30,7 +30,7 @@ export class AuthController {
 	@Post('login')
 	@HttpCode(200)
 	@ApiBody({ type: LoginUserDto, required: true })
-	login(@Req() req: Request & { user: User }): Promise<AccessTokenDto> {
+	login(@Req() req: Request & { user: UserInterface }): Promise<AccessTokenDto> {
 		return this.authService.login(req.user);
 	}
 }
