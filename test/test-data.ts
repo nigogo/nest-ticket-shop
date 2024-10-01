@@ -27,10 +27,10 @@ export const userDto: UserDto = {
 };
 
 export const createEventDto: CreateEventDto = {
-	available_tickets: 20000,
-	date: new Date('2024-07-15T19:30:00Z'),
-	location: 'Madison Square Garden, New York City, USA',
 	name: 'Madison Square Garden Summer Festival',
-	ticket_price: 150.00,
+	location: 'Madison Square Garden, New York City, USA',
+	date: new Date('2024-07-15T19:30:00Z'),
 	total_tickets: 20000,
+	available_tickets: 20000,
+	ticket_price: 149.99,
 };

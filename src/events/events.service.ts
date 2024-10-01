@@ -19,4 +19,8 @@ export class EventsService {
 	async findAll(): Promise<Event[]> {
 		return this.eventRepository.find();
 	}
+
+	async findOne(id: number): Promise<Event> {
+		return this.eventRepository.findOneByOrFail({ id });
+	}
 }

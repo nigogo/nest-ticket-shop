@@ -15,6 +15,13 @@ async function bootstrap() {
 	});
 	app.use(helmet());
 	app.setGlobalPrefix('api/v1');
+	// app.useGlobalInterceptors(
+	// 	new ClassSerializerInterceptor(app.get(Reflector), {
+	// 		enableImplicitConversion: true,
+	// 		excludeExtraneousValues: true,
+	// 		strategy: 'excludeAll',
+	// 	},)
+	// );
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
@@ -22,6 +29,7 @@ async function bootstrap() {
 			transform: true,
 			transformOptions: {
 				enableImplicitConversion: true,
+				excludeExtraneousValues: true,
 			},
 		})
 	);
@@ -41,4 +49,5 @@ async function bootstrap() {
 
 	await app.listen(3000);
 }
+
 bootstrap();
