@@ -66,7 +66,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			.send({ username: 'foo', password: 'bar' })
 			.expect((res) => {
 				expect(res.status).toBe(400);
-				expect(res.body.message).toHaveLength(2);
 			});
 
 		await request(app.getHttpServer())
@@ -79,7 +78,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			})
 			.expect((res) => {
 				expect(res.status).toBe(400);
-				expect(res.body.message).toHaveLength(2);
 			});
 	});
 

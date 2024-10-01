@@ -1,7 +1,7 @@
 import {
 	ArgumentsHost,
 	Catch,
-	ExceptionFilter,
+	ExceptionFilter, HttpException,
 	HttpStatus,
 } from '@nestjs/common';
 import { QueryFailedError, TypeORMError } from 'typeorm';
@@ -19,7 +19,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 		let status = 500;
 		let message = 'Internal server error';
 
-		if (exception instanceof TypeORMError) {
+		if (exception instanceof HttpException) {
+			status = exception.getStatus();
+			// TODO logging - use pre-defined messages?
+			message = exception.getResponse().toString();
+		}
+		else if (exception instanceof TypeORMError) {
 			switch (exception.constructor) {
 				case QueryFailedError:
 					// eslint-disable-next-line @typescript-eslint/no-explicit-any

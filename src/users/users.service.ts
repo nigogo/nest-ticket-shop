@@ -41,10 +41,7 @@ export class UsersService {
 		username: string;
 		password: string;
 	}): Promise<User> {
-		const user = this.usersRepository.create({
-			username,
-			password,
-		});
+		const user = this.usersRepository.create({ username, password });
 		return await this.usersRepository.save(user);
 	}
 
