@@ -85,6 +85,8 @@ jobs:
       # Run e2e tests
       - name: Run e2e tests
         env:
-          TEST_DB_PORT: ${{ vars.TEST_DB_PORT }}
           DB_URL: ${{ vars.DB_URL }}
+          TEST_DB_PORT: ${{ vars.TEST_DB_PORT }}
+          JWT_SECRET: ${{ vars.JWT_SECRET }}
+          JWT_EXPIRES_IN: ${{ vars.JWT_EXPIRES_IN }}
         run: npm run test:e2e:ci

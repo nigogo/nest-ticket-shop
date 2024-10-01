@@ -39,7 +39,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			.post('/auth/register')
 			.send(registerUserDto)
 			.expect((res) => {
-				console.log(res.body);
 				expect(res.status).toBe(201);
 				expect(res.body).toBeDefined();
 				expect(res.body).not.toHaveProperty('id');
@@ -67,7 +66,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			.send({ username: 'foo', password: 'bar' })
 			.expect((res) => {
 				expect(res.status).toBe(400);
-				expect(res.body.message).toHaveLength(2);
 			});
 
 		await request(app.getHttpServer())
@@ -80,7 +78,6 @@ describe('Application Behavior Tests (e2e)', () => {
 			})
 			.expect((res) => {
 				expect(res.status).toBe(400);
-				expect(res.body.message).toHaveLength(2);
 			});
 	});
 

@@ -6,9 +6,9 @@ import { validate } from 'class-validator';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { UsersModule } from '../users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
+import fn = jest.fn;
 
 describe('AuthController', () => {
 	let controller: AuthController;
@@ -16,7 +16,6 @@ describe('AuthController', () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			imports: [
-				UsersModule,
 				PassportModule,
 				JwtModule.register({
 					secret: 'secret',
@@ -25,19 +24,17 @@ describe('AuthController', () => {
 			],
 			controllers: [AuthController],
 			providers: [
-				AuthService,
-				// PrismaService,
 				LocalStrategy,
 				JwtStrategy,
+				{
+					provide: AuthService,
+					useValue: {
+						register: fn(() => Promise.resolve({ id: 1, ...registerUserDto })),
+						login: fn(() => Promise.resolve({ accessToken: 'token' })),
+					},
+				},
 			],
-		})
-			// .overrideProvider(PrismaService)
-			// .useValue({
-			// 	user: mockDeep<PrismaClient['user']>({
-			// 		create: jest.fn().mockResolvedValue(userDto),
-			// 	}),
-			// })
-			.compile();
+		}).compile();
 
 		controller = module.get<AuthController>(AuthController);
 	});

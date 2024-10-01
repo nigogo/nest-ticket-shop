@@ -34,19 +34,15 @@ export class UsersService {
 		}
 	}
 
-	async createUser({username, password}: { username: string, password: string }): Promise<User> {
-		try {
-			const user = this.usersRepository.create({
-				username,
-				password,
-			});
-			return await this.usersRepository.save(user);
-		} catch (e) {
-			// TODO global error handling
-			// TODO concise error handling
-			this.logger.error(e);
-			throw e;
-		}
+	async createUser({
+		username,
+		password,
+	}: {
+		username: string;
+		password: string;
+	}): Promise<User> {
+		const user = this.usersRepository.create({ username, password });
+		return await this.usersRepository.save(user);
 	}
 
 	async getUser(id: number): Promise<UserDto> {
