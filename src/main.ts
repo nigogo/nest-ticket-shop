@@ -1,9 +1,8 @@
-import { HttpAdapterHost, NestFactory } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
-import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -16,10 +15,6 @@ async function bootstrap() {
 	});
 	app.use(helmet());
 	app.setGlobalPrefix('api/v1');
-
-	const httpAdapterHost = app.get(HttpAdapterHost);
-	app.useGlobalFilters(new GlobalExceptionFilter(httpAdapterHost));
-
 	app.useGlobalPipes(
 		new ValidationPipe({
 			whitelist: true,
