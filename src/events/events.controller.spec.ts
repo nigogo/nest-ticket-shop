@@ -20,4 +20,6 @@ describe('EventsController', () => {
 
   // TODO total_ticket > 0
   // TODO available_tickets <= total_tickets
+  // TODO ticket_price numeric(6, 2)
+  // TODO date ISO8601
 });

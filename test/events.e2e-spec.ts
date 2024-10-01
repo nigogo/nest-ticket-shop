@@ -46,12 +46,26 @@ describe('Events e2e Tests', () => {
 		await app.close();
 	});
 
-	// 404 if event not found
-	// single event - 403 if user is not logged in
-	// POST event - 401 if user is not logged in
-	// POST event - 400 if data is invalid
-	// POST event - 201 if event is created
-	// POST event - 403 if user is not an admin
+	it('/events (POST) - should create an event', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201)
+			.expect((res) => {
+				expect(res.body).toHaveProperty('id');
+				expect(res.body).toHaveProperty('created_at');
+				expect(res.body).toHaveProperty('updated_at');
+				expect(res.body).toHaveProperty('name', createEventDto.name);
+				expect(new Date(res.body.date)).toEqual(createEventDto.date);
+				expect(res.body).toHaveProperty('location', createEventDto.location);
+				expect(res.body).toHaveProperty('total_tickets', createEventDto.total_tickets);
+				expect(res.body).toHaveProperty('available_tickets', createEventDto.total_tickets);
+				expect(res.body).toHaveProperty('ticket_price', createEventDto.ticket_price);
+			});
+	});
 
 	it('/events (GET) - should return all events', async () => {
 		const token = await utils.registerUserAndLogin();
@@ -67,7 +81,7 @@ describe('Events e2e Tests', () => {
 			});
 	});
 
-	it('/events (GET) - should return 403 if user is not logged in', async () => {
+	it('/events (GET) - should return 401 if user is not logged in', async () => {
 		await request(app.getHttpServer())
 			.get('/events')
 			.expect(401);
@@ -88,14 +102,15 @@ describe('Events e2e Tests', () => {
 			.expect(200)
 			.expect((res) => {
 				expect(res.body).toHaveProperty('id', event.id);
-				expect(res.body).toHaveProperty('created_at');
-				expect(res.body).toHaveProperty('updated_at');
-				expect(res.body).toHaveProperty('name', createEventDto.name);
-				expect(new Date(res.body.date)).toEqual(createEventDto.date);
-				expect(res.body).toHaveProperty('location', createEventDto.location);
-				expect(res.body).toHaveProperty('total_tickets', createEventDto.total_tickets);
-				expect(res.body).toHaveProperty('available_tickets', createEventDto.total_tickets);
-				expect(res.body).toHaveProperty('ticket_price', createEventDto.ticket_price);
+				expect(res.body).toHaveProperty('name', event.name);
 			});
 	});
+
+	it('/events/:id (GET) - should return 401 if user is not logged in', () => {
+		return request(app.getHttpServer())
+			.get('/events/1')
+			.expect(401);
+	});
+
+	// TODO auth POST event - 403 if user is not an admin
 });

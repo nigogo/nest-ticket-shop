@@ -31,6 +31,7 @@ export class CreateEventDto {
 	total_tickets!: number;
 
 	@ApiProperty()
+	@IsInt()
 	@IsLessThanOrEqualTo('total_tickets')
 	available_tickets!: number;
 
