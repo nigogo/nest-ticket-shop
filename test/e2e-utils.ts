@@ -3,6 +3,7 @@ import * as request from 'supertest';
 import { INestApplication } from '@nestjs/common';
 import { RegisterUserDto } from '../src/auth/dto/register-user.dto';
 import { registerUserDto } from './test-data';
+import { validate } from 'class-validator';
 
 export class E2eUtils {
 	constructor(private app: INestApplication) {}
@@ -30,4 +31,12 @@ export class E2eUtils {
 			.send(createEventDto)
 			.expect(201);
 	}
+}
+
+export const expectValidationConstraintError = async <T extends object>(dto: T, property: keyof T, constraint: string) => {
+	const errors = await validate(dto);
+	const errorForProperty = errors.find(error => error.property === property);
+	expect(errorForProperty).toBeDefined();
+	expect(errorForProperty?.constraints).toBeDefined();
+	expect(Object.keys(errorForProperty?.constraints || {})).toContain(constraint);
 }

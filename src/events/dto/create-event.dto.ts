@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+	IsDate,
 	IsInt,
-	IsISO8601,
 	IsNotEmpty,
 	IsNumber,
 	IsString,
@@ -17,7 +17,7 @@ export class CreateEventDto {
 	name!: string;
 
 	@ApiProperty()
-	@IsISO8601({ strict: true })
+	@IsDate()
 	date!: Date;
 
 	@ApiProperty()
