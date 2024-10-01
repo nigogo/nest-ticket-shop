@@ -37,6 +37,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 		}
 
 		// TODO logging - rework this to use a logger and a sensible log message
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		console.error(status, JSON.stringify((exception as any).message.message, null, 2));
+
 		httpAdapter.reply(
 			ctx.getResponse<Response>(),
 			{
