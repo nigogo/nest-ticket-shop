@@ -17,4 +17,7 @@ describe('EventsController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
+
+  // TODO total_ticket > 0
+  // TODO available_tickets <= total_tickets
 });
