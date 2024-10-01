@@ -3,6 +3,9 @@ import { AuthService } from './auth.service';
 import { registerUserDto } from '../../test/test-data';
 import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { User } from '../users/user.entity';
 
 describe('AuthService', () => {
 	let service: AuthService;
@@ -10,22 +13,30 @@ describe('AuthService', () => {
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			imports: [
-				UsersModule,
 				JwtModule.register({
 					secret: 'secret',
 					signOptions: { expiresIn: '2m' },
 				}),
 			],
-			providers: [AuthService],
-		})
-			// .overrideProvider(PrismaService)
-			// .useValue({
-			// 	user: mockDeep<PrismaClient['user']>({
-			// 		create: jest.fn().mockResolvedValue(userDto),
-			// 		findUnique: jest.fn().mockResolvedValue(user),
-			// 	}),
-			// })
-			.compile();
+			providers: [
+				AuthService,
+				{
+					provide: UsersService,
+					useValue: {
+						createUser: jest.fn(() =>
+							Promise.resolve({ id: 1, ...registerUserDto })
+						),
+						getUserForInternalUse: jest.fn(() =>
+							Promise.resolve({ id: 1, ...registerUserDto })
+						),
+					},
+				},
+				{
+					provide: getRepositoryToken(User),
+					useValue: {},
+				},
+			],
+		}).compile();
 
 		service = module.get<AuthService>(AuthService);
 	});
@@ -36,8 +47,7 @@ describe('AuthService', () => {
 
 	it('should compare the password to the hash when validating a user', async () => {
 		const spy = jest.spyOn(service, 'comparePasswords');
-		// TODO test data
-		// await service.register(registerUserDto);
+		await service.register(registerUserDto);
 		const { username, password } = registerUserDto;
 		await service.validateUser({ username, password });
 		expect(spy).toHaveBeenCalledTimes(1);
