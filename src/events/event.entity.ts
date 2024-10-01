@@ -23,7 +23,7 @@ export class Event implements EventInterface {
 	@Column()
 	name!: string;
 
-	@Column({ type: 'date' })
+	@Column({ type: 'timestamptz' })
 	date!: Date;
 
 	@Column()
@@ -35,7 +35,15 @@ export class Event implements EventInterface {
 	@Column({ type: 'int', default: 0 })
 	available_tickets!: number;
 
-	@Column({ type: 'decimal', precision: 6, scale: 2 })
+	@Column({
+		type: 'decimal',
+		precision: 6,
+		scale: 2,
+		transformer: {
+			from: (value: string) => parseFloat(value),
+			to: (value: number) => value,
+		},
+	})
 	ticket_price!: number;
 
 	@OneToMany(() => Ticket, (ticket) => ticket.event)

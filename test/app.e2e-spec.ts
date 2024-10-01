@@ -31,6 +31,8 @@ describe('Application Behavior Tests (e2e)', () => {
 
 	afterEach(async () => {
 		await userRepository.delete({});
+		// TODO timing issue with clearing database, remove temporary fix
+		await new Promise((resolve) => setTimeout(resolve, 100));
 		await app.close();
 	});
 
