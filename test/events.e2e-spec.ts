@@ -87,7 +87,6 @@ describe('Events e2e Tests', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(200)
 			.expect((res) => {
-				console.log(res.body);
 				expect(res.body).toHaveProperty('id', event.id);
 				expect(res.body).toHaveProperty('created_at');
 				expect(res.body).toHaveProperty('updated_at');

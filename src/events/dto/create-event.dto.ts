@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-	IsDecimal,
 	IsInt,
 	IsISO8601,
 	IsNotEmpty,
+	IsNumber,
 	IsString,
 	Max,
 	Min,
@@ -35,8 +35,8 @@ export class CreateEventDto {
 	available_tickets!: number;
 
 	@ApiProperty()
-	@IsDecimal({ decimal_digits: '2' })
 	@Min(0)
 	@Max(9999.99)
+	@IsNumber({ maxDecimalPlaces: 2 })
 	ticket_price!: number;
 }
