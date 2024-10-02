@@ -30,36 +30,19 @@ export const pinoConfig: Params = {
 			};
 		},
 
-		// customSuccessObject: (req, res, val) => {
-		// 	return {
-		// 		...val,
-		// 		res: {
-		// 			...val.res,
-		// 		}
-		// 	};
-		// },
-
-		// customLogLevel: (res, err) => {
-		// 	if (res.statusCode >= 400 && res.statusCode < 500) {
-		// 		return 'warn';
-		// 	} else if (res.statusCode >= 500 || err) {
-		// 		return 'error';
-		// 	}
-		// 	return 'info';
-		// },
 		serializers: {
 			req(req) {
 				return {
 					method: req.method,
 					url: req.url,
-					// trackingId: req.headers['x-tracking-id'],
 				};
 			},
 			res(res) {
+				console.log(res.rawBody);
+
 				return {
-					statusCode: res.statusCode,
-					body: res.body,
-					// trackingId: res.headers['x-tracking-id'],
+					// TODO to return a response i need to read the body stream
+					// body: "<response body goes here>",
 				};
 			},
 		},
