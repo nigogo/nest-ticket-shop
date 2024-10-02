@@ -34,6 +34,7 @@ export class AuthService {
 		const payload: JwtPayload = {
 			sub: user.id,
 			username: user.username,
+			role: user.role,
 			jti: randomUUID(),
 		};
 		return {
@@ -53,6 +54,7 @@ export class AuthService {
 			return {
 				id: user.id,
 				username: user.username,
+				role: user.role,
 			};
 		}
 		return null;

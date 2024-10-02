@@ -10,7 +10,7 @@ import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { UserDto } from './dto/user.dto';
-import { LocalAuthGuard } from './guards/local-auth.guard';
+import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { UserInterface } from '../common/interfaces/user.interface';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { Request } from 'express';

@@ -23,6 +23,7 @@ export class UsersService {
 					id: user.id,
 					username: user.username,
 					password: user.password,
+					role: user.role,
 				};
 			}
 			return null;

@@ -5,16 +5,34 @@ import { EventsService } from './events.service';
 import { validate } from 'class-validator';
 import { CreateEventDto } from './dto/create-event.dto';
 import { expectValidationConstraintError } from '../../test/e2e-utils';
+import { CaslModule } from '../casl/casl.module';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Ticket } from '../tickets/ticket.entity';
+import { Event } from './event.entity';
+import { TicketsService } from '../tickets/tickets.service';
 
 describe('EventsController', () => {
 	let controller: EventsController;
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
+			imports: [CaslModule],
 			controllers: [EventsController],
 			providers: [
 				{
 					provide: EventsService,
+					useValue: {},
+				},
+				{
+					provide: TicketsService,
+					useValue: {},
+				},
+				{
+					provide: getRepositoryToken(Event),
+					useValue: {},
+				},
+				{
+					provide: getRepositoryToken(Ticket),
 					useValue: {},
 				},
 			],
@@ -52,7 +70,11 @@ describe('EventsController', () => {
 		event.total_tickets = 100;
 		event.available_tickets = 200;
 
-		await expectValidationConstraintError(event, 'available_tickets', 'IsLessThanOrEqualTo');
+		await expectValidationConstraintError(
+			event,
+			'available_tickets',
+			'IsLessThanOrEqualTo'
+		);
 	});
 
 	it('should fail if the ticket price is not within constraints', async () => {
@@ -73,7 +95,7 @@ describe('EventsController', () => {
 		const event = new CreateEventDto();
 		Object.assign(event, createEventDto);
 
-		event.date = 'invalid date'
+		event.date = 'invalid date';
 		await expectValidationConstraintError(event, 'date', 'isIso8601');
 	});
 });

@@ -8,6 +8,7 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { createEventDto, registerUserDto } from './test-data';
 import { E2eUtils } from './e2e-utils';
+import { CaslModule } from '../src/casl/casl.module';
 
 describe('Events e2e Tests', () => {
 	let app: INestApplication;
@@ -19,6 +20,7 @@ describe('Events e2e Tests', () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [
 				AppModule,
+				CaslModule,
 				TypeOrmModule.forRoot({
 					type: 'postgres',
 					url: process.env.DB_URL,
@@ -48,7 +50,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events (POST) - should create an event', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		await request(app.getHttpServer())
 			.post('/events')
@@ -78,7 +80,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events (GET) - should return all events', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 		await utils.createEvent(createEventDto, token);
 		await utils.createEvent(createEventDto, token);
 
@@ -96,7 +98,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (GET) - should return a single event', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -121,7 +123,7 @@ describe('Events e2e Tests', () => {
 	// TODO auth POST event - 403 if user is not an admin
 
 	it('/events/:id (GET) - should return 404 if event does not exist', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -136,7 +138,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (PUT) - should update an event', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -165,8 +167,8 @@ describe('Events e2e Tests', () => {
 			});
 	});
 
-	it('/events/:id (PUT) - should return 400 if total tickets are decreased', async () => {
-		const token = await utils.registerUserAndLogin();
+	it('/events/:id (PUT) - should return 400 if total_tickets are decreased', async () => {
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -187,7 +189,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (PUT) - should return 404 if event does not exist', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -210,7 +212,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (PUT) - should return 400 if invalid data is sent', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -233,7 +235,7 @@ describe('Events e2e Tests', () => {
 	// TODO auth PUT event - should fail if available tickets are sent
 
 	it('/events/:id (DELETE) - should delete an event', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')
@@ -261,7 +263,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (DELETE) - should return 404 if event does not exist', async () => {
-		const token = await utils.registerUserAndLogin();
+		const token = await utils.registerAdminUserAndLogin(userRepository);
 
 		const { body: event } = await request(app.getHttpServer())
 			.post('/events')

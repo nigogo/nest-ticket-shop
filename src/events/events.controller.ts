@@ -16,7 +16,7 @@ import {
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { EventDto } from './dto/event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
@@ -24,6 +24,10 @@ import { User } from '../users/user.entity';
 import { TicketsService } from '../tickets/tickets.service';
 import * as process from 'node:process';
 import { Response } from 'express';
+import { AbilityGuard } from '../common/guards/ability.guard';
+import { CheckPolicies } from '../common/decorators/policy.decorator';
+import { Event } from './event.entity';
+import { Ticket } from '../tickets/ticket.entity';
 
 @Controller('events')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -37,28 +41,32 @@ export class EventsController {
 	) {}
 
 	// TODO auth - use jwt auth guard for all routes by default and make exceptions where needed
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('create', Event))
 	@Post()
 	@ApiBearerAuth()
 	async createEvent(@Body() createEventDto: CreateEventDto): Promise<EventDto> {
 		return this.eventsService.create(createEventDto);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('read', Event))
 	@Get()
 	@ApiBearerAuth()
 	async getAllEvents(): Promise<EventDto[]> {
 		return this.eventsService.findAll();
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('read', Event))
 	@Get(':id')
 	@ApiBearerAuth()
 	async getEvent(@Param('id') id: number): Promise<EventDto> {
 		return this.eventsService.findOne(id);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('update', Event))
 	@Put(':id')
 	@ApiBearerAuth()
 	async updateEvent(
@@ -69,7 +77,8 @@ export class EventsController {
 	}
 
 	// Note: We could return a 200 containing the filename, UUID or url of the JSON file
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('delete', Event))
 	@Delete(':id')
 	@HttpCode(204)
 	@ApiBearerAuth()
@@ -77,7 +86,8 @@ export class EventsController {
 		return this.eventsService.remove(id);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, AbilityGuard)
+	@CheckPolicies((ability) => ability.can('create', Ticket))
 	@Post(':id/tickets')
 	@ApiBearerAuth()
 	async createTicket(
