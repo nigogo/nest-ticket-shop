@@ -19,8 +19,8 @@ export class CreateEventDto {
 	name!: string;
 
 	@ApiProperty({ type: String, format: 'date-time' })
-	@IsISO8601({ strict: true })
 	@Transform(({ value }) => new Date(value))
+	@IsISO8601({ strict: true })
 	date!: Date;
 
 	@ApiProperty()
@@ -34,8 +34,8 @@ export class CreateEventDto {
 	total_tickets!: number;
 
 	@ApiProperty()
-	@IsInt()
 	@IsLessThanOrEqualTo('total_tickets')
+	@IsInt()
 	available_tickets!: number;
 
 	@ApiProperty()
