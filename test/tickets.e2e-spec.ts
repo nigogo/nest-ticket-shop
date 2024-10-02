@@ -67,16 +67,43 @@ describe('Tickets e2e Tests', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(201)
 			.expect((res) => {
-				console.log(res.body);
 				expect(res.body).toHaveProperty('id');
 				expect(res.body).toHaveProperty('user_id');
 				expect(res.body).toHaveProperty('event_id', event.id);
 				expect(res.body).toHaveProperty('price_paid', event.ticket_price);
 				expect(res.body).toHaveProperty('purchase_time');
 			});
+
+		await request(app.getHttpServer())
+			.get(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body.available_tickets).toBe(event.available_tickets - 1);
+			});
 	});
 
 	// TODO POST events/:id/tickets - should return 409 if the event is sold out
+	it('/events/:id/tickets (POST) - should return 409 if the event is sold out', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send({ ...createEventDto, total_tickets: 1, available_tickets: 1 })
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.post(`/events/${event.id}/tickets`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.post(`/events/${event.id}/tickets`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(409);
+	});
+
 	// TODO POST events/:id/tickets - should return 404 if the event does not exist
 	// TODO POST events/:id/tickets - should return 401 if user is not logged in
 });
