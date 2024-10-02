@@ -5,6 +5,7 @@ import {
 	Get,
 	Param,
 	Post,
+	Put,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { EventDto } from './dto/event.dto';
+import { UpdateEventDto } from './dto/update-event.dto';
 
 @Controller('events')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -40,5 +42,15 @@ export class EventsController {
 	@ApiBearerAuth()
 	async getEvent(@Param('id') id: number): Promise<EventDto> {
 		return this.eventsService.findOne(id);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Put(':id')
+	@ApiBearerAuth()
+	async updateEvent(
+		@Param('id') id: number,
+		@Body() createEventDto: UpdateEventDto,
+	): Promise<EventDto> {
+		return this.eventsService.update(id, createEventDto);
 	}
 }

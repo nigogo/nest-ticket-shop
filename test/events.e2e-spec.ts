@@ -128,4 +128,104 @@ describe('Events e2e Tests', () => {
 			.set('Authorization', `Bearer ${token}`)
 			.expect(404);
 	});
+
+	it('/events/:id (PUT) - should update an event', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		const updatedEvent = {
+			...createEventDto,
+			name: 'Updated Event',
+			location: 'Updated Location',
+			date: '2025-01-01T00:00:00.000Z',
+			total_tickets: 20001,
+		};
+
+		await request(app.getHttpServer())
+			.put(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(updatedEvent)
+			.expect(200)
+			.expect((res) => {
+				expect(res.body).toHaveProperty('id', event.id);
+				expect(res.body).toHaveProperty('name', updatedEvent.name);
+				expect(res.body).toHaveProperty('location', updatedEvent.location);
+				expect(res.body).toHaveProperty('date', updatedEvent.date);
+			});
+	});
+
+	// TODO auth PUT event - 400 if total tickets are decreased
+	it('/events/:id (PUT) - should return 400 if total tickets are decreased', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		const updatedEvent = {
+			...createEventDto,
+			total_tickets: 100,
+		};
+
+		await request(app.getHttpServer())
+			.put(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(updatedEvent)
+			.expect(400);
+	});
+
+	it('/events/:id (PUT) - should return 404 if event does not exist', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.put(`/events/${event.id + 1}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(404);
+	});
+
+	// TODO auth PUT event - 401 if user is not logged in
+	it('/events/:id (PUT) - should return 401 if user is not logged in', async () => {
+		await request(app.getHttpServer())
+			.post('/events')
+			.send(createEventDto)
+			.expect(401);
+	});
+
+	// TODO auth PUT event - should fail for invalide data
+	it('/events/:id (PUT) - should return 400 if invalid data is sent', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		const updatedEvent = {
+			...createEventDto,
+			date: 'invalid date',
+		};
+
+		await request(app.getHttpServer())
+			.put(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.send(updatedEvent)
+			.expect(400);
+	});
+
+	// TODO auth PUT event - should fail if available tickets are sent
 });
