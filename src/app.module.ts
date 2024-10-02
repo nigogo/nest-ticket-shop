@@ -16,6 +16,7 @@ import {
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoConfig } from '../pino.config';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
 	imports: [
@@ -31,6 +32,7 @@ import { pinoConfig } from '../pino.config';
 			synchronize: true,
 			autoLoadEntities: true,
 		}),
+		CaslModule,
 	],
 	controllers: [AppController],
 	providers: [
