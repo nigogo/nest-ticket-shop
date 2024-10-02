@@ -3,10 +3,14 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule);
+	const app = await NestFactory.create(AppModule, {
+		bufferLogs: true,
+	});
 
+	app.useLogger(app.get(Logger));
 	app.enableCors({
 		origin: 'localhost:3000',
 		allowedHeaders: ['Content-Type', 'Authorization'],
@@ -15,6 +19,7 @@ async function bootstrap() {
 	});
 	app.use(helmet());
 	app.setGlobalPrefix('api/v1');
+	// TODO cleanup - check if injection is necessary, maybe init in main.ts
 	// app.useGlobalInterceptors(
 	// 	new ClassSerializerInterceptor(app.get(Reflector), {
 	// 		enableImplicitConversion: true,
