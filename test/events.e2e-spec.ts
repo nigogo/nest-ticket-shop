@@ -6,7 +6,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AppModule } from '../src/app.module';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { createEventDto } from './test-data';
+import { createEventDto, registerUserDto } from './test-data';
 import { E2eUtils } from './e2e-utils';
 
 describe('Events e2e Tests', () => {
@@ -41,6 +41,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	afterEach(async () => {
+		// TODO remove all files created during tests (event-*.json)
 		await eventRepository.delete({});
 		await userRepository.delete({});
 		await app.close();
@@ -61,9 +62,18 @@ describe('Events e2e Tests', () => {
 				expect(res.body).toHaveProperty('name', createEventDto.name);
 				expect(new Date(res.body.date)).toEqual(new Date(createEventDto.date));
 				expect(res.body).toHaveProperty('location', createEventDto.location);
-				expect(res.body).toHaveProperty('total_tickets', createEventDto.total_tickets);
-				expect(res.body).toHaveProperty('available_tickets', createEventDto.total_tickets);
-				expect(res.body).toHaveProperty('ticket_price', createEventDto.ticket_price);
+				expect(res.body).toHaveProperty(
+					'total_tickets',
+					createEventDto.total_tickets
+				);
+				expect(res.body).toHaveProperty(
+					'available_tickets',
+					createEventDto.total_tickets
+				);
+				expect(res.body).toHaveProperty(
+					'ticket_price',
+					createEventDto.ticket_price
+				);
 			});
 	});
 
@@ -82,9 +92,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events (GET) - should return 401 if user is not logged in', async () => {
-		await request(app.getHttpServer())
-			.get('/events')
-			.expect(401);
+		await request(app.getHttpServer()).get('/events').expect(401);
 	});
 
 	it('/events/:id (GET) - should return a single event', async () => {
@@ -107,9 +115,7 @@ describe('Events e2e Tests', () => {
 	});
 
 	it('/events/:id (GET) - should return 401 if user is not logged in', () => {
-		return request(app.getHttpServer())
-			.get('/events/1')
-			.expect(401);
+		return request(app.getHttpServer()).get('/events/1').expect(401);
 	});
 
 	// TODO auth POST event - 403 if user is not an admin
@@ -159,7 +165,6 @@ describe('Events e2e Tests', () => {
 			});
 	});
 
-	// TODO auth PUT event - 400 if total tickets are decreased
 	it('/events/:id (PUT) - should return 400 if total tickets are decreased', async () => {
 		const token = await utils.registerUserAndLogin();
 
@@ -197,7 +202,6 @@ describe('Events e2e Tests', () => {
 			.expect(404);
 	});
 
-	// TODO auth PUT event - 401 if user is not logged in
 	it('/events/:id (PUT) - should return 401 if user is not logged in', async () => {
 		await request(app.getHttpServer())
 			.post('/events')
@@ -205,7 +209,6 @@ describe('Events e2e Tests', () => {
 			.expect(401);
 	});
 
-	// TODO auth PUT event - should fail for invalide data
 	it('/events/:id (PUT) - should return 400 if invalid data is sent', async () => {
 		const token = await utils.registerUserAndLogin();
 
@@ -228,4 +231,56 @@ describe('Events e2e Tests', () => {
 	});
 
 	// TODO auth PUT event - should fail if available tickets are sent
+
+	it('/events/:id (DELETE) - should delete an event', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.delete(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(204);
+
+		// wait for the event to be deleted
+		await new Promise((resolve) => setTimeout(resolve, 200));
+
+		const { body: { access_token: token2 } } = await request(app.getHttpServer())
+			.post('/auth/login')
+			.send(registerUserDto)
+			.expect(200);
+
+		await request(app.getHttpServer())
+			.get(`/events/${event.id}`)
+			.set('Authorization', `Bearer ${token2}`)
+			.expect(404);
+	});
+
+	it('/events/:id (DELETE) - should return 404 if event does not exist', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.delete(`/events/${event.id + 1}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(404);
+	});
+
+	it('/events/:id (DELETE) - should return 401 if user is not logged in', async () => {
+		await request(app.getHttpServer())
+			.delete('/events/0')
+			.send(createEventDto)
+			.expect(401);
+	});
+
+	// TODO auth DELETE event - should return 403 if user is not an admin
 });

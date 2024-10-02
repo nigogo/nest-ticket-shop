@@ -33,7 +33,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			if ((exception as any).code === '23505') {
 				status = HttpStatus.CONFLICT;
 				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				message = (exception as any).message;
+				message = (exception as any).detail;
 			}
 		}
 		else if (exception instanceof EntityNotFoundError) {
