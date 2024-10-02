@@ -1,4 +1,4 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import { ClassSerializerInterceptor, Logger, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -7,7 +7,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventsModule } from './events/events.module';
 import { TicketsModule } from './tickets/tickets.module';
 import * as process from 'node:process';
-import { APP_FILTER, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
+import {
+	APP_FILTER,
+	APP_INTERCEPTOR,
+	HttpAdapterHost,
+	Reflector,
+} from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoConfig } from '../pino.config';
@@ -18,7 +23,7 @@ import { pinoConfig } from '../pino.config';
 		UsersModule,
 		EventsModule,
 		TicketsModule,
-		LoggerModule.forRoot(pinoConfig, ),
+		LoggerModule.forRoot(pinoConfig),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
 			url: process.env.DB_URL,
@@ -30,6 +35,7 @@ import { pinoConfig } from '../pino.config';
 	controllers: [AppController],
 	providers: [
 		AppService,
+		Logger,
 		// TODO cleanup - check if injection is necessary, maybe init in main.ts
 		{
 			provide: APP_INTERCEPTOR,
@@ -41,7 +47,13 @@ import { pinoConfig } from '../pino.config';
 				});
 			},
 		},
-		{ provide: APP_FILTER, useClass: GlobalExceptionFilter },
+		{
+			provide: APP_FILTER,
+			inject: [HttpAdapterHost],
+			useFactory: (httpAdapterHost: HttpAdapterHost) => {
+				return new GlobalExceptionFilter(httpAdapterHost);
+			},
+		},
 	],
 })
 export class AppModule {}

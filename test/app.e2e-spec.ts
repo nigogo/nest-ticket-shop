@@ -11,6 +11,12 @@ describe('Application Behavior Tests (e2e)', () => {
 	let app: INestApplication;
 	let userRepository: Repository<User>;
 
+	const clearDatabase = async () => {
+		await userRepository.delete({});
+		// TODO timing issue with clearing database, remove temporary fix
+		await new Promise((resolve) => setTimeout(resolve, 500));
+	}
+
 	beforeEach(async () => {
 		const moduleFixture: TestingModule = await Test.createTestingModule({
 			imports: [AppModule, TypeOrmModule.forRoot({
@@ -27,12 +33,12 @@ describe('Application Behavior Tests (e2e)', () => {
 		userRepository = moduleFixture.get<Repository<User>>(
 			getRepositoryToken(User)
 		);
+
+		await clearDatabase();
 	});
 
 	afterEach(async () => {
-		await userRepository.delete({});
-		// TODO timing issue with clearing database, remove temporary fix
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await clearDatabase();
 		await app.close();
 	});
 

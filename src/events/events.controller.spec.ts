@@ -46,13 +46,14 @@ describe('EventsController', () => {
 	});
 
 	// TODO fix
-	// it('should fail if available_tickets > total_tickets', async () => {
-	// 	const event: CreateEventDto = createEventDto;
-	// 	Object.assign(event, createEventDto);
-	// 	event.total_tickets = 1;
-	// 	event.available_tickets = 2;
-	// 	await expectValidationConstraintError(event, 'available_tickets', 'islessthanorequalto');
-	// });
+	it('should fail if available_tickets > total_tickets', async () => {
+		const event = new CreateEventDto();
+		Object.assign(event, createEventDto);
+		event.total_tickets = 100;
+		event.available_tickets = 200;
+
+		await expectValidationConstraintError(event, 'available_tickets', 'IsLessThanOrEqualTo');
+	});
 
 	it('should fail if the ticket price is not within constraints', async () => {
 		const event = new CreateEventDto();
@@ -72,7 +73,7 @@ describe('EventsController', () => {
 		const event = new CreateEventDto();
 		Object.assign(event, createEventDto);
 
-		event.date = 'invalid date' as unknown as Date;
+		event.date = 'invalid date'
 		await expectValidationConstraintError(event, 'date', 'isIso8601');
 	});
 });
