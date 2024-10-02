@@ -232,7 +232,6 @@ describe('Events e2e Tests', () => {
 
 	// TODO auth PUT event - should fail if available tickets are sent
 
-	// TODO DELETE event - should delete an event
 	it('/events/:id (DELETE) - should delete an event', async () => {
 		const token = await utils.registerUserAndLogin();
 
@@ -276,7 +275,6 @@ describe('Events e2e Tests', () => {
 			.expect(404);
 	});
 
-	// TODO DELETE event - should return 401 if user is not logged in
 	it('/events/:id (DELETE) - should return 401 if user is not logged in', async () => {
 		await request(app.getHttpServer())
 			.delete('/events/0')
