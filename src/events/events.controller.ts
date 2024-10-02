@@ -2,7 +2,9 @@ import {
 	Body,
 	ClassSerializerInterceptor,
 	Controller,
+	Delete,
 	Get,
+	HttpCode,
 	Param,
 	Post,
 	Put,
@@ -49,8 +51,17 @@ export class EventsController {
 	@ApiBearerAuth()
 	async updateEvent(
 		@Param('id') id: number,
-		@Body() createEventDto: UpdateEventDto,
+		@Body() createEventDto: UpdateEventDto
 	): Promise<EventDto> {
 		return this.eventsService.update(id, createEventDto);
+	}
+
+	// Note: We could return a 200 containing the filename, UUID or url of the JSON file
+	@UseGuards(JwtAuthGuard)
+	@Delete(':id')
+	@HttpCode(204)
+	@ApiBearerAuth()
+	async deleteEvent(@Param('id') id: number): Promise<void> {
+		return this.eventsService.remove(id);
 	}
 }
