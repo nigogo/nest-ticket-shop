@@ -9,7 +9,7 @@ import { UserInterface } from '../common/interfaces/user.interface';
 import { AccessTokenDto } from './dto/access-token.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -34,7 +34,7 @@ export class AuthService {
 		const payload: JwtPayload = {
 			sub: user.id,
 			username: user.username,
-			jti: uuidv4(),
+			jti: randomUUID(),
 		};
 		return {
 			// TODO use RS256 algorithm
