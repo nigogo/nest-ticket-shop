@@ -9,6 +9,7 @@ import {
 import { UserInterface } from '../common/interfaces/user.interface';
 import { Ticket } from '../tickets/ticket.entity';
 
+// TODO extract to common
 export enum UserType {
 	USER = 'user',
 	ADMIN = 'admin',
