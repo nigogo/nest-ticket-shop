@@ -52,7 +52,6 @@ describe('Tickets e2e Tests', () => {
 		await app.close();
 	});
 
-	// TODO POST events/:id/tickets - should create a ticket
 	it('/events/:id/tickets (POST) - should create a ticket', async () => {
 		const token = await utils.registerUserAndLogin();
 
@@ -83,7 +82,6 @@ describe('Tickets e2e Tests', () => {
 			});
 	});
 
-	// TODO POST events/:id/tickets - should return 409 if the event is sold out
 	it('/events/:id/tickets (POST) - should return 409 if the event is sold out', async () => {
 		const token = await utils.registerUserAndLogin();
 
@@ -104,6 +102,26 @@ describe('Tickets e2e Tests', () => {
 			.expect(409);
 	});
 
-	// TODO POST events/:id/tickets - should return 404 if the event does not exist
-	// TODO POST events/:id/tickets - should return 401 if user is not logged in
+	it('/events/:id/tickets (POST) - should return 404 if the event does not exist', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		await request(app.getHttpServer())
+			.post(`/events/0/tickets`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(404);
+	});
+
+	it('/events/:id/tickets (POST) - should return 401 if user is not logged in', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.post(`/events/${event.id}/tickets`)
+			.expect(401);
+	});
 });

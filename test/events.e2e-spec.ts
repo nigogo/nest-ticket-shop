@@ -282,32 +282,5 @@ describe('Events e2e Tests', () => {
 			.expect(401);
 	});
 
-	// TODO auth DELETE event - should return 403 if user is not an admin
-
-	// TODO POST events/:id/tickets - should create a ticket
-	it('/events/:id/tickets (POST) - should create a ticket', async () => {
-		const token = await utils.registerUserAndLogin();
-
-		const { body: event } = await request(app.getHttpServer())
-			.post('/events')
-			.set('Authorization', `Bearer ${token}`)
-			.send(createEventDto)
-			.expect(201);
-
-		await request(app.getHttpServer())
-			.post(`/events/${event.id}/tickets`)
-			.set('Authorization', `Bearer ${token}`)
-			.expect(201)
-			.expect((res) => {
-				expect(res.body).toHaveProperty('id');
-				expect(res.body).toHaveProperty('created_at');
-				expect(res.body).toHaveProperty('updated_at');
-				expect(res.body).toHaveProperty('user_id');
-				expect(res.body).toHaveProperty('event_id', event.id);
-			});
-	});
-
-	// TODO POST events/:id/tickets - should return 409 if the event is sold out
-	// TODO POST events/:id/tickets - should return 404 if the event does not exist
-	// TODO POST events/:id/tickets - should return 401 if user is not logged in
+	// TODO DELETE event - should return 403 if user is not an admin
 });
