@@ -8,9 +8,12 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import { createEventDto } from './test-data';
 import { E2eUtils } from './e2e-utils';
+import * as process from 'node:process';
 
 describe('Tickets e2e Tests', () => {
 	const API_BASE_URL = process.env.API_BASE_URL;
+	const TICKET_INCREMENT = process.env.TICKET_INCREMENT;
+	const PRICE_INCREMENT = process.env.PRICE_INCREMENT;
 
 	let app: INestApplication;
 	let userRepository: Repository<User>;
@@ -129,5 +132,31 @@ describe('Tickets e2e Tests', () => {
 		await request(app.getHttpServer())
 			.post(`/events/${event.id}/tickets`)
 			.expect(401);
+	});
+
+	// TODO POST /events/:id/tickets - price should go up by PRICE_INCREMENT after TICKET_INCREMENT tickets are sold
+	it('/events/:id/tickets (POST) - should increase ticket price after TICKET_INCREMENT tickets are sold', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send({ ...createEventDto})
+			.expect(201);
+
+		for (let i = 0; i < Number(TICKET_INCREMENT); i++) {
+			await request(app.getHttpServer())
+				.post(`/events/${event.id}/tickets`)
+				.set('Authorization', `Bearer ${token}`)
+				.expect(201);
+		}
+
+		await request(app.getHttpServer())
+			.post(`/events/${event.id}/tickets`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(201)
+			.expect((res) => {
+				expect(res.body.price_paid).toBe(createEventDto.ticket_price + Number(PRICE_INCREMENT));
+			});
 	});
 });

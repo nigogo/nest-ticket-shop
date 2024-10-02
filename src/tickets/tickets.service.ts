@@ -3,9 +3,13 @@ import { Ticket } from './ticket.entity';
 import { DataSource } from 'typeorm';
 import { TicketDto } from './dto/ticket.dto';
 import { Event } from '../events/event.entity';
+import * as process from 'node:process';
 
 @Injectable()
 export class TicketsService {
+	private TICKET_INCREMENT = process.env.TICKET_INCREMENT;
+	private PRICE_INCREMENT = process.env.PRICE_INCREMENT;
+
 	constructor(private dataSource: DataSource) {}
 
 	async create({
@@ -29,10 +33,13 @@ export class TicketsService {
 				throw new ConflictException('No available tickets');
 			}
 
+			// calculate ticket price
+			const price_paid = this.calculateTicketPrice(event);
+
 			const ticket = queryRunner.manager.create(Ticket, {
 				user: { id: userId },
 				event: { id: eventId },
-				price_paid: event.ticket_price,
+				price_paid,
 				purchase_time: new Date(),
 			});
 			const storedTicket = await queryRunner.manager.save(Ticket, ticket);
@@ -56,5 +63,15 @@ export class TicketsService {
 		} finally {
 			await queryRunner.release();
 		}
+	}
+
+	// TODO unit test
+	// Note: A better alternative would be to store the amount of sold tickets in the event entity instead of calculating it
+	private calculateTicketPrice(event: Event): number {
+		const soldTickets = event.total_tickets - event.available_tickets;
+		const soldTicketBlocks = Math.floor(
+			soldTickets / Number(this.TICKET_INCREMENT)
+		);
+		return event.ticket_price + soldTicketBlocks * Number(this.PRICE_INCREMENT);
 	}
 }
