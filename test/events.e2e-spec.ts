@@ -49,8 +49,6 @@ describe('Events e2e Tests', () => {
 	it('/events (POST) - should create an event', async () => {
 		const token = await utils.registerUserAndLogin();
 
-		console.log('createEventDto', createEventDto);
-
 		await request(app.getHttpServer())
 			.post('/events')
 			.set('Authorization', `Bearer ${token}`)
@@ -61,7 +59,7 @@ describe('Events e2e Tests', () => {
 				expect(res.body).toHaveProperty('created_at');
 				expect(res.body).toHaveProperty('updated_at');
 				expect(res.body).toHaveProperty('name', createEventDto.name);
-				expect(new Date(res.body.date)).toEqual(createEventDto.date);
+				expect(new Date(res.body.date)).toEqual(new Date(createEventDto.date));
 				expect(res.body).toHaveProperty('location', createEventDto.location);
 				expect(res.body).toHaveProperty('total_tickets', createEventDto.total_tickets);
 				expect(res.body).toHaveProperty('available_tickets', createEventDto.total_tickets);

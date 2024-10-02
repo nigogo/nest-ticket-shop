@@ -9,7 +9,6 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		bufferLogs: true,
 	});
-
 	app.useLogger(app.get(Logger));
 	app.enableCors({
 		origin: 'localhost:3000',
@@ -34,7 +33,6 @@ async function bootstrap() {
 			transform: true,
 			transformOptions: {
 				enableImplicitConversion: true,
-				excludeExtraneousValues: true,
 			},
 		})
 	);

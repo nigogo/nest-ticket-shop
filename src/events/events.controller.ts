@@ -3,8 +3,8 @@ import {
 	ClassSerializerInterceptor,
 	Controller,
 	Get,
+	Param,
 	Post,
-	Query,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -38,7 +38,7 @@ export class EventsController {
 	@UseGuards(JwtAuthGuard)
 	@Get(':id')
 	@ApiBearerAuth()
-	async getEvent(@Query('id') id: number): Promise<EventDto> {
+	async getEvent(@Param('id') id: number): Promise<EventDto> {
 		return this.eventsService.findOne(id);
 	}
 }

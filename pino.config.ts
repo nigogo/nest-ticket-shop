@@ -38,8 +38,6 @@ export const pinoConfig: Params = {
 				};
 			},
 			res(res) {
-				console.log(res.rawBody);
-
 				return {
 					// TODO to return a response i need to read the body stream
 					// body: "<response body goes here>",
