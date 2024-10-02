@@ -17,12 +17,19 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { EventDto } from './dto/event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { User } from '../users/user.entity';
+import { TicketsService } from '../tickets/tickets.service';
+import { TicketDto } from '../tickets/dto/ticket.dto';
 
 @Controller('events')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('events')
 export class EventsController {
-	constructor(private readonly eventsService: EventsService) {}
+	constructor(
+		private readonly eventsService: EventsService,
+		private readonly ticketsService: TicketsService
+	) {}
 
 	// TODO auth - use jwt auth guard for all routes by default and make exceptions where needed
 	@UseGuards(JwtAuthGuard)
@@ -63,5 +70,15 @@ export class EventsController {
 	@ApiBearerAuth()
 	async deleteEvent(@Param('id') id: number): Promise<void> {
 		return this.eventsService.remove(id);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post(':id/tickets')
+	@ApiBearerAuth()
+	async createTicket(
+		@Param('id') id: number,
+		@GetUser() { id: userId }: User
+	): Promise<TicketDto> {
+		return this.ticketsService.create({ eventId: id, userId });
 	}
 }
