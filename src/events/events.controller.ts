@@ -5,9 +5,11 @@ import {
 	Delete,
 	Get,
 	HttpCode,
+	HttpStatus,
 	Param,
 	Post,
 	Put,
+	Res,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -20,12 +22,15 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from '../users/user.entity';
 import { TicketsService } from '../tickets/tickets.service';
-import { TicketDto } from '../tickets/dto/ticket.dto';
+import * as process from 'node:process';
+import { Response } from 'express';
 
 @Controller('events')
 @UseInterceptors(ClassSerializerInterceptor)
 @ApiTags('events')
 export class EventsController {
+	private API_BASE_URL = process.env.API_BASE_URL;
+
 	constructor(
 		private readonly eventsService: EventsService,
 		private readonly ticketsService: TicketsService
@@ -77,8 +82,11 @@ export class EventsController {
 	@ApiBearerAuth()
 	async createTicket(
 		@Param('id') id: number,
-		@GetUser() { id: userId }: User
-	): Promise<TicketDto> {
-		return this.ticketsService.create({ eventId: id, userId });
+		@GetUser() { id: userId }: User,
+		@Res() res: Response
+	) {
+		const ticket = await this.ticketsService.create({ eventId: id, userId });
+		res.setHeader('Location', `${this.API_BASE_URL}/tickets/${ticket.id}`);
+		res.status(HttpStatus.CREATED).json(ticket);
 	}
 }

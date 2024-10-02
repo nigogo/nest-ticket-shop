@@ -10,6 +10,8 @@ import { createEventDto } from './test-data';
 import { E2eUtils } from './e2e-utils';
 
 describe('Tickets e2e Tests', () => {
+	const API_BASE_URL = process.env.API_BASE_URL;
+
 	let app: INestApplication;
 	let userRepository: Repository<User>;
 	let eventRepository: Repository<Event>;
@@ -71,6 +73,10 @@ describe('Tickets e2e Tests', () => {
 				expect(res.body).toHaveProperty('event_id', event.id);
 				expect(res.body).toHaveProperty('price_paid', event.ticket_price);
 				expect(res.body).toHaveProperty('purchase_time');
+				expect(res.headers).toHaveProperty(
+					'location',
+					`${API_BASE_URL}/tickets/${res.body.id}`
+				);
 			});
 
 		await request(app.getHttpServer())
