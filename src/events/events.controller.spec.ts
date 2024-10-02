@@ -73,6 +73,6 @@ describe('EventsController', () => {
 		Object.assign(event, createEventDto);
 
 		event.date = 'invalid date' as unknown as Date;
-		await expectValidationConstraintError(event, 'date', 'isDate');
+		await expectValidationConstraintError(event, 'date', 'isIso8601');
 	});
 });

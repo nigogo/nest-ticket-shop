@@ -9,11 +9,16 @@ import { TicketsModule } from './tickets/tickets.module';
 import * as process from 'node:process';
 import { APP_FILTER, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { LoggerModule } from 'nestjs-pino';
+import { pinoConfig } from '../pino.config';
 
 @Module({
 	imports: [
 		AuthModule,
 		UsersModule,
+		EventsModule,
+		TicketsModule,
+		LoggerModule.forRoot(pinoConfig, ),
 		TypeOrmModule.forRoot({
 			type: 'postgres',
 			url: process.env.DB_URL,
@@ -21,12 +26,11 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 			synchronize: true,
 			autoLoadEntities: true,
 		}),
-		EventsModule,
-		TicketsModule,
 	],
 	controllers: [AppController],
 	providers: [
 		AppService,
+		// TODO cleanup - check if injection is necessary, maybe init in main.ts
 		{
 			provide: APP_INTERCEPTOR,
 			inject: [Reflector],

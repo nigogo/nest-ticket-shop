@@ -49,6 +49,8 @@ describe('Events e2e Tests', () => {
 	it('/events (POST) - should create an event', async () => {
 		const token = await utils.registerUserAndLogin();
 
+		console.log('createEventDto', createEventDto);
+
 		await request(app.getHttpServer())
 			.post('/events')
 			.set('Authorization', `Bearer ${token}`)
@@ -113,4 +115,19 @@ describe('Events e2e Tests', () => {
 	});
 
 	// TODO auth POST event - 403 if user is not an admin
+
+	it('/events/:id (GET) - should return 404 if event does not exist', async () => {
+		const token = await utils.registerUserAndLogin();
+
+		const { body: event } = await request(app.getHttpServer())
+			.post('/events')
+			.set('Authorization', `Bearer ${token}`)
+			.send(createEventDto)
+			.expect(201);
+
+		await request(app.getHttpServer())
+			.get(`/events/${event.id + 1}`)
+			.set('Authorization', `Bearer ${token}`)
+			.expect(404);
+	});
 });

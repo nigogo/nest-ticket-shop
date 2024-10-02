@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import {
 	IsDate,
 	IsInt,
+	IsISO8601,
 	IsNotEmpty,
 	IsNumber,
 	IsString,
@@ -9,6 +10,7 @@ import {
 	Min,
 } from 'class-validator';
 import { IsLessThanOrEqualTo } from '../../common/decorators/is-less-than-or-equal-to.decorator';
+import { Transform } from 'class-transformer';
 
 export class CreateEventDto {
 	@ApiProperty()
@@ -16,8 +18,9 @@ export class CreateEventDto {
 	@IsNotEmpty()
 	name!: string;
 
-	@ApiProperty()
-	@IsDate()
+	@ApiProperty({ type: String, format: 'date-time' })
+	@IsISO8601({ strict: true })
+	@Transform(({ value }) => new Date(value))
 	date!: Date;
 
 	@ApiProperty()
