@@ -282,5 +282,5 @@ describe('Events e2e Tests', () => {
 			.expect(401);
 	});
 
-	// TODO auth DELETE event - should return 403 if user is not an admin
+	// TODO DELETE event - should return 403 if user is not an admin
 });
