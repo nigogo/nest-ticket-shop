@@ -51,7 +51,7 @@ async function bootstrap() {
 			transform: true,
 			transformOptions: {
 				enableImplicitConversion: true,
-				// TODO exludeExtraneousValues: true,
+				excludeExtraneousValues: true,
 			},
 		})
 	);
