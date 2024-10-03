@@ -3,8 +3,6 @@ import { UserInterface } from '../common/interfaces/user.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
-import { UserDto } from '../auth/dto/user.dto';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -16,25 +14,17 @@ export class UsersService {
 	) {}
 
 	async getUserForInternalUse(username: string): Promise<UserInterface | null> {
-		try {
-			const user = await this.usersRepository.findOneBy({ username });
-			if (user) {
-				return {
-					id: user.id,
-					username: user.username,
-					password: user.password,
-					role: user.role,
-				};
-			}
-			return null;
-		} catch (e) {
-			// TODO global error handling
-			// TODO concise error handling
-			this.logger.error(e);
-			throw e;
+		const user = await this.usersRepository.findOneBy({ username });
+		if (user) {
+			return {
+				id: user.id,
+				username: user.username,
+				password: user.password,
+				role: user.role,
+			};
 		}
+		return null;
 	}
-
 	async createUser({
 		username,
 		password,
@@ -44,19 +34,5 @@ export class UsersService {
 	}): Promise<User> {
 		const user = this.usersRepository.create({ username, password });
 		return await this.usersRepository.save(user);
-	}
-
-	async getUser(id: number): Promise<UserDto> {
-		try {
-			const user = await this.usersRepository.findOneOrFail({
-				where: { id },
-			});
-			return plainToInstance(UserDto, user);
-		} catch (e) {
-			// TODO global error handling
-			// TODO concise error handling
-			this.logger.error(e);
-			throw e;
-		}
 	}
 }

@@ -25,21 +25,17 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
 		if (exception instanceof HttpException) {
 			status = exception.getStatus();
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			({ message } = exception.getResponse() as any);
-			// message = resMsg;
-		} else if (exception instanceof QueryFailedError) {
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			if ((exception as any).code === '23505') {
+			({ message } = exception.getResponse() as any); // eslint-disable-line @typescript-eslint/no-explicit-any
+		}
+		else if (exception instanceof QueryFailedError) {
+			if ((exception as any).code === '23505') { // eslint-disable-line @typescript-eslint/no-explicit-any
 				status = HttpStatus.CONFLICT;
-				// eslint-disable-next-line @typescript-eslint/no-explicit-any
-				message = (exception as any).detail;
+				message = (exception as any).detail;// eslint-disable-line @typescript-eslint/no-explicit-any
 			}
 		}
 		else if (exception instanceof EntityNotFoundError) {
 			status = HttpStatus.NOT_FOUND;
-			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-			message = (exception as any).message;
+			message = (exception as any).message; // eslint-disable-line @typescript-eslint/no-explicit-any
 		}
 		else {
 			status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -51,50 +47,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 			exception.stack,
 			`${request.method} ${request.url}`
 		);
-
-		// switch (exception.constructor) {
-		// 	case BadRequestException:
-		// 		status = HttpStatus.BAD_REQUEST;
-		// 		message = (exception as BadRequestException).message;
-		// 		break;
-		// 	case HttpException:
-		// 		status = (exception as HttpException).getStatus();
-		// 		message = (exception as HttpException).message;
-		// 		break;
-		// 	case ValidationError:
-		// 		status = HttpStatus.BAD_REQUEST;
-		// 		message = (exception as HttpException).message;
-		// 		break;
-		// 	case QueryFailedError:
-		// 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		// 		if ((exception as any).code === '23505') {
-		// 			status = HttpStatus.CONFLICT;
-		// 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		// 			message = (exception as any).message;
-		// 		}
-		// 		break;
-		// 	default:
-		// 		status = HttpStatus.INTERNAL_SERVER_ERROR;
-		// 		message = 'Internal server error';
-		// 		break;
-		// }
-
-		// if (exception instanceof HttpException) {
-		// 	status = exception.getStatus();
-		// 	// TODO logging - use pre-defined messages?
-		// 	message = exception.getResponse().toString();
-		// }
-		// else if (exception instanceof TypeORMError) {
-		// 	switch (exception.constructor) {
-		// 		case QueryFailedError:
-		// 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		// 			if ((exception as any).code === '23505') {
-		// 				status = HttpStatus.CONFLICT;
-		// 				message = 'Conflict';
-		// 			}
-		// 			break;
-		// 	}
-		// }
 
 		httpAdapter.reply(
 			ctx.getResponse<Response>(),
