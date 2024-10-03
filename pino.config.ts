@@ -6,27 +6,32 @@ import { randomUUID } from 'crypto';
 export const pinoConfig: Params = {
 	pinoHttp: {
 		level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
-		autoLogging: true,	// enables logging of entry and exit logs
+		autoLogging: true, // enables logging of entry and exit logs
+
+		redact: [
+			'responseBody.access_token',
+			'responseBody.password',
+		],
 
 		genReqId: (req, res) => {
-			const existingID = req.id ?? req.headers["x-tracking-id"]
-			if (existingID) return existingID
-			const id = randomUUID()
-			res.setHeader('x-tracking-id', id)
-			return id
+			const existingID = req.id ?? req.headers['x-tracking-id'];
+			if (existingID) return existingID;
+			const id = randomUUID();
+			res.setHeader('x-tracking-id', id);
+			return id;
 		},
 
 		customReceivedMessage: (req) => {
-			return `ENTRY ${req.url} (${req.method})`
+			return `ENTRY ${req.url} (${req.method})`;
 		},
 
 		customSuccessMessage: (req, res) => {
-			return `EXIT ${req.url} (${req.method}) - ${res.statusCode}`
+			return `EXIT ${req.url} (${req.method}) - ${res.statusCode}`;
 		},
 
 		customProps: (req) => {
 			return {
-				"x-tracking-id": req.id
+				'x-tracking-id': req.id,
 			};
 		},
 
@@ -37,10 +42,9 @@ export const pinoConfig: Params = {
 					url: req.url,
 				};
 			},
-			res(res) {
+			res(res) { // eslint-disable-line @typescript-eslint/no-unused-vars
 				return {
-					// TODO to return a response i need to read the body stream
-					// body: "<response body goes here>",
+					// Note: This would be the place to return the response body that is stored on the response object
 				};
 			},
 		},
