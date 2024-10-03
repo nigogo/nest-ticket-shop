@@ -4,12 +4,29 @@ import helmet from 'helmet';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
+import * as process from 'node:process';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
 		bufferLogs: true,
 	});
 	app.useLogger(app.get(Logger));
+
+	// Note: These are not strictly necessary
+	process.on('unhandledRejection', (reason, promise) => {
+		app.get(Logger).error(reason, promise);
+	});
+	process.on('uncaughtException', (error) => {
+		app.get(Logger).error(error);
+	});
+
+	// setTimeout(() => {
+	// 	throw new Error('Uncaught Exception');
+	// }, 100);
+	// setTimeout(() => {
+	// 	Promise.reject(new Error('Unhandled Rejection'));
+	// }, 100);
+
 	app.enableCors({
 		origin: 'localhost:3000',
 		allowedHeaders: ['Content-Type', 'Authorization'],
@@ -33,6 +50,7 @@ async function bootstrap() {
 			transform: true,
 			transformOptions: {
 				enableImplicitConversion: true,
+				// TODO exludeExtraneousValues: true,
 			},
 		})
 	);
