@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import * as process from 'node:process';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule, {
@@ -54,6 +55,7 @@ async function bootstrap() {
 			},
 		})
 	);
+	app.useGlobalInterceptors(new LoggingInterceptor());
 
 	// TODO Note: Disable Swagger in production (it will negatively impact cold start times)
 	const config = new DocumentBuilder()
