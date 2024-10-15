@@ -7,8 +7,6 @@ A simple ticket shop API that allows users to buy tickets for events and admins 
 1. `npm install` (Install dependencies)
 2. `cp .env.example .env` (Copy the .env.example file to .env)
 3. `docker compose up db -d` (Start the database container)
-4. `npm run prisma:generate` (Generate Prisma client)
-5. `npm run prisma:migrate` (Run migrations)
 6. `npm run start:dev:local` (Start the api in development mode)
 7. Go to `http://localhost:3000/api/v1` to view the Swagger documentation
 
